@@ -1,8 +1,8 @@
 declare global {
   var mongoose: {
-    conn: any;
-    promise: any;
+    conn: unknown;
+    promise: unknown;
   };
 }
 
-export {};
+export { };

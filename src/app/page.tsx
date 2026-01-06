@@ -1,5 +1,11 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { motion } from 'framer-motion';
+import { Check, Clock, Copy, Eye, Send } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Home() {
@@ -12,7 +18,6 @@ export default function Home() {
 
   const handleGenerate = async () => {
     if (!text.trim()) {
-      alert('Please enter some text');
       return;
     }
 
@@ -33,7 +38,7 @@ export default function Home() {
         const link = `${window.location.origin}/view/${data.id}`;
         setGeneratedLink(link);
       }
-    } catch (error) {
+    } catch {
       alert('Failed to generate link');
     } finally {
       setLoading(false);
@@ -47,115 +52,133 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2 text-center">
-            Text Share
+    <div className="container mx-auto max-w-4xl py-12 px-4 md:py-24">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="text-center mb-12 space-y-4">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl">
+            Share Text Securely
           </h1>
-          <p className="text-gray-600 text-center mb-8">
-            Share text securely with expiration options
+          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            Paste your text, set an expiration, and share the link. Once it&apos;s gone, it&apos;s gone forever.
           </p>
+        </div>
 
-          <div className="space-y-6">
-            {/* Text Input */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Your Text
-              </label>
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                className="w-full h-48 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none bg-white text-gray-900"
-                placeholder="Paste or type your text here..."
-              />
-            </div>
+        <Card className="border-border/50 shadow-2xl bg-card/50 backdrop-blur-sm">
+          <CardHeader>
+            <CardTitle>New Paste</CardTitle>
+            <CardDescription>
+              Enter the text you want to share securely.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              className="min-h-[200px] font-mono text-base resize-none focus-visible:ring-offset-0"
+              placeholder="Type your sensitive content here..."
+            />
 
-            {/* Expiration Options */}
-            <div className="bg-gray-50 rounded-lg p-6 space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800">
-                Expiration Settings
-              </h3>
-              
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setExpirationType('views')}
-                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-                    expirationType === 'views'
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:border-indigo-300'
-                  }`}
-                >
-                  By Views
-                </button>
-                <button
-                  onClick={() => setExpirationType('time')}
-                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all ${
-                    expirationType === 'time'
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'bg-white text-gray-700 border border-gray-300 hover:border-indigo-300'
-                  }`}
-                >
-                  By Time
-                </button>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Expiration Type
+                </label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={expirationType === 'views' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setExpirationType('views')}
+                  >
+                    <Eye className="mr-2 size-4" />
+                    Views
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={expirationType === 'time' ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setExpirationType('time')}
+                  >
+                    <Clock className="mr-2 size-4" />
+                    Time
+                  </Button>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {expirationType === 'views' 
-                    ? 'Number of Views' 
-                    : 'Hours Until Expiration'}
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  {expirationType === 'views' ? 'Max Views' : 'Hours'}
                 </label>
-                <input
+                <Input
                   type="number"
+                  min="1"
                   value={expirationValue}
                   onChange={(e) => setExpirationValue(e.target.value)}
-                  min="1"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent  bg-white text-gray-900"
-                  placeholder={expirationType === 'views' ? '10' : '24'}
+                  placeholder={expirationType === 'views' ? 'e.g. 10' : 'e.g. 24'}
                 />
               </div>
             </div>
-
-            {/* Generate Button */}
-            <button
+          </CardContent>
+          <CardFooter className="flex flex-col gap-4">
+            <Button
+              size="lg"
+              className="w-full text-lg h-12"
               onClick={handleGenerate}
               disabled={loading || !text.trim()}
-              className="w-full bg-indigo-600 text-white py-4 rounded-lg font-semibold text-lg hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-lg hover:shadow-xl"
             >
-              {loading ? 'Generating...' : 'Generate Link'}
-            </button>
+              {loading ? (
+                'Generating...'
+              ) : (
+                <>
+                  Generate Link <Send className="ml-2 size-4" />
+                </>
+              )}
+            </Button>
 
-            {/* Generated Link */}
             {generatedLink && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-6 space-y-3">
-                <h3 className="text-lg font-semibold text-green-800">
-                  Link Generated Successfully!
-                </h3>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={generatedLink}
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="w-full space-y-2"
+              >
+                <div className="relative">
+                  <Input
                     readOnly
-                    className="flex-1 px-4 py-3 bg-white border border-green-300 rounded-lg text-sm text-green-900"
+                    value={generatedLink}
+                    className="pr-24 h-12 font-mono text-sm bg-muted/50"
                   />
-                  <button
+                  <Button
+                    size="sm"
+                    className="absolute right-1 top-1 h-10"
                     onClick={copyToClipboard}
-                    className="px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
                   >
-                    {copied ? '✓ Copied!' : 'Copy'}
-                  </button>
+                    {copied ? (
+                      <>
+                        <Check className="mr-2 size-4" /> Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="mr-2 size-4" /> Copy
+                      </>
+                    )}
+                  </Button>
                 </div>
-                <p className="text-sm text-green-700">
-                  {expirationType === 'views' 
-                    ? `This link will expire after ${expirationValue} views` 
-                    : `This link will expire in ${expirationValue} hours`}
+                <p className="text-sm text-muted-foreground text-center">
+                  This link will expire after{' '}
+                  <span className="font-medium text-foreground">
+                    {expirationValue} {expirationType === 'views' ? 'views' : 'hours'}
+                  </span>
+                  .
                 </p>
-              </div>
+              </motion.div>
             )}
-          </div>
-        </div>
-      </div>
+          </CardFooter>
+        </Card>
+      </motion.div>
     </div>
   );
 }
